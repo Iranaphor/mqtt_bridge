@@ -8,8 +8,8 @@ init_cmd: |
 windows:
 - name: roscores
   panes:
-  - server; roscore -p ${PORT}
-  - client; roscore -p ${PORT}
+  - server ; roscore -p ${PORT}
+  - client ; roscore -p ${PORT}
   check: "server ; rostopic list ; client ; rostopic list"
 
 - name: server
