@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- the control port for the dynamic server -->
+  <arg name="control_topic" default="__dynamic_server" />
+
+  <arg name="bridge_ip" default="localhost" />
+  <arg name="bridge_port" default="9090" />
+
+
+
+  <node pkg="mqtt_bridge" name="mqtt_bridge" type="mqtt_bridge_node.py" output="screen" respawn="true">
+    <rosparam subst_value="True">
+mqtt:
+  client:
+    protocol: 4      # MQTTv311
+  connection: #IP and Port of server
+    host: $(arg bridge_ip)
+    port: $(arg bridge_port)
+    keepalive: 60
+
+# Default is json serializer, msgpack is more efficient
+serializer: msgpack:dumps
+deserializer: msgpack:loads
+bridge:
+
+  # Dynamic Connection Server
+  - factory: mqtt_bridge.bridge:DynamicBridgeServer
+    control_topic: '$(arg control_topic)'
+
+  # Publisher from client to make accessible on server
+  - factory: mqtt_bridge.bridge:PublishBridge
+    control_topic: '$(arg control_topic)'
+    msg_type: 'std_msgs.msg:String'
+    topic_from: '/ping' #owned by client
+    topic_to: '/client/pong' #accessed by server
+    latched: false
+    qos: 0
+
+    </rosparam>
+  </node>
+</launch>
