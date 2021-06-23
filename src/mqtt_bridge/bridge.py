@@ -12,6 +12,7 @@ from threading  import Condition
 from queue import Queue
 from uuid import uuid4
 
+from pprint import pformat
 
 def create_bridge(factory, **kwargs):
     u""" bridge generator function
@@ -109,20 +110,20 @@ class DynamicBridgeServer(Bridge):
         :param mqtt.MQTTMessage mqtt_msg: MQTT message
         """
         msg_dict = self._deserialize(mqtt_msg.payload)
+        payload = pformat(msg_dict, width=1)
 
         if msg_dict['op'] == 'mqtt2ros_subscribe':
-            rospy.loginfo("forward mqtt topic to ros %s" % (
-                msg_dict['args']))
+            rospy.logwarn("Client request (forward mqtt topic to ros): \n%s\n" % payload)
             self._bridges.add(MqttToRosBridge(
                 **msg_dict['args'])
             )
-
-        if msg_dict['op'] == 'ros2mqtt_subscribe':
-            rospy.loginfo("forward ros topic to mqtt %s" % (
-                msg_dict['args']))
+        elif msg_dict['op'] == 'ros2mqtt_subscribe':
+            rospy.logwarn("Client request (forward ros topic to mqtt): \n%s\n" % payload)
             self._bridges.add(RosToMqttBridge(
                 **msg_dict['args'])
             )
+        else:
+            rospy.logwarn("Client request: \n%s\n" % payload)
 
 
 class RosToMqttBridge(Bridge):
