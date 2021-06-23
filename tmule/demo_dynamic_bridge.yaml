@@ -1,17 +1,15 @@
 ---
 session: mqtt_dynamic_client_server
 init_cmd: |
-    source ~/Iranaphor_RAS/devel/setup.bash
     export ROS_HOSTNAME=localhost
     function server () { export PORT=11311 ; export ROS_MASTER_URI=http://${ROS_HOSTNAME}:${PORT} ; }
     function client () { export PORT=11411 ; export ROS_MASTER_URI=http://${ROS_HOSTNAME}:${PORT} ; }
-    #tmux select-layout even-horizontal
 
 windows:
 - name: roscores
   panes:
-  - server; roscore -p ${PORT}
-  - client; roscore -p ${PORT}
+  - server ; roscore -p ${PORT}
+  - client ; roscore -p ${PORT}
   check: "server ; rostopic list ; client ; rostopic list"
 
 - name: server
